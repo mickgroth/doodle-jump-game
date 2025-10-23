@@ -9,8 +9,16 @@ canvas.height = 600;
 // Game variables
 let gameState = 'start'; // 'start', 'playing', 'gameover'
 let score = 0;
-let highScore = localStorage.getItem('doodleJumpHighScore') || 0;
 let cameraY = 0;
+
+// Leaderboard
+const MAX_LEADERBOARD_ENTRIES = 10;
+let leaderboard = JSON.parse(localStorage.getItem('doodleJumpLeaderboard')) || [];
+
+// High score is derived from leaderboard
+function getHighScore() {
+    return leaderboard.length > 0 ? leaderboard[0].score : 0;
+}
 
 // Player object
 const player = {
@@ -916,10 +924,111 @@ function updateBackgroundElements() {
     }
 }
 
+// Leaderboard Functions
+function saveLeaderboard() {
+    localStorage.setItem('doodleJumpLeaderboard', JSON.stringify(leaderboard));
+}
+
+function loadLeaderboard() {
+    leaderboard = JSON.parse(localStorage.getItem('doodleJumpLeaderboard')) || [];
+}
+
+function isHighScore(score) {
+    // Check if score qualifies for leaderboard
+    if (leaderboard.length < MAX_LEADERBOARD_ENTRIES) {
+        return true;
+    }
+    return score > leaderboard[leaderboard.length - 1].score;
+}
+
+function addToLeaderboard(name, score) {
+    leaderboard.push({ name, score, date: new Date().toISOString() });
+    
+    // Sort by score (descending)
+    leaderboard.sort((a, b) => b.score - a.score);
+    
+    // Keep only top entries
+    leaderboard = leaderboard.slice(0, MAX_LEADERBOARD_ENTRIES);
+    
+    saveLeaderboard();
+}
+
+function showLeaderboard() {
+    const leaderboardList = document.getElementById('leaderboardList');
+    leaderboardList.innerHTML = '';
+    
+    if (leaderboard.length === 0) {
+        leaderboardList.innerHTML = '<div class="leaderboard-empty">No scores yet. Be the first!</div>';
+    } else {
+        leaderboard.forEach((entry, index) => {
+            const entryDiv = document.createElement('div');
+            entryDiv.className = `leaderboard-entry rank-${index + 1}`;
+            
+            const rank = document.createElement('span');
+            rank.className = 'leaderboard-rank';
+            rank.textContent = `#${index + 1}`;
+            
+            const name = document.createElement('span');
+            name.className = 'leaderboard-name';
+            name.textContent = entry.name;
+            
+            const score = document.createElement('span');
+            score.className = 'leaderboard-score';
+            score.textContent = entry.score;
+            
+            entryDiv.appendChild(rank);
+            entryDiv.appendChild(name);
+            entryDiv.appendChild(score);
+            
+            leaderboardList.appendChild(entryDiv);
+        });
+    }
+    
+    document.getElementById('leaderboardModal').classList.remove('hidden');
+}
+
+function hideLeaderboard() {
+    document.getElementById('leaderboardModal').classList.add('hidden');
+}
+
+function promptForName(score) {
+    document.getElementById('newHighScore').textContent = score;
+    document.getElementById('playerNameInput').value = '';
+    document.getElementById('nameInputModal').classList.remove('hidden');
+    
+    // Focus the input
+    setTimeout(() => {
+        document.getElementById('playerNameInput').focus();
+    }, 100);
+}
+
+function submitPlayerName() {
+    const nameInput = document.getElementById('playerNameInput');
+    const name = nameInput.value.trim() || 'Anonymous';
+    
+    addToLeaderboard(name, score);
+    
+    // Update high score display after adding to leaderboard
+    document.getElementById('highScore').textContent = getHighScore();
+    document.getElementById('finalHighScore').textContent = getHighScore();
+    
+    document.getElementById('nameInputModal').classList.add('hidden');
+}
+
+function skipPlayerName() {
+    addToLeaderboard('Anonymous', score);
+    
+    // Update high score display after adding to leaderboard
+    document.getElementById('highScore').textContent = getHighScore();
+    document.getElementById('finalHighScore').textContent = getHighScore();
+    
+    document.getElementById('nameInputModal').classList.add('hidden');
+}
+
 // Initialize game
 function init() {
-    document.getElementById('highScore').textContent = highScore;
-    document.getElementById('finalHighScore').textContent = highScore;
+    document.getElementById('highScore').textContent = getHighScore();
+    document.getElementById('finalHighScore').textContent = getHighScore();
     
     // Initialize audio
     initAudio();
@@ -949,6 +1058,20 @@ function init() {
     document.getElementById('startBtn').addEventListener('click', startGame);
     document.getElementById('restartBtn').addEventListener('click', restartGame);
     document.getElementById('muteBtn').addEventListener('click', toggleMute);
+    
+    // Leaderboard event listeners
+    document.getElementById('leaderboardBtn').addEventListener('click', showLeaderboard);
+    document.getElementById('viewLeaderboardBtn').addEventListener('click', showLeaderboard);
+    document.getElementById('closeLeaderboardBtn').addEventListener('click', hideLeaderboard);
+    document.getElementById('submitNameBtn').addEventListener('click', submitPlayerName);
+    document.getElementById('skipNameBtn').addEventListener('click', skipPlayerName);
+    
+    // Allow Enter key to submit name
+    document.getElementById('playerNameInput').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            submitPlayerName();
+        }
+    });
     
     // Show start screen
     document.getElementById('startScreen').classList.remove('hidden');
@@ -1350,14 +1473,16 @@ function update() {
         // Update difficulty level display
         updateDifficultyDisplay(score);
         
-        // Remove platforms that are off screen
-        platforms = platforms.filter(platform => platform.y < canvas.height + 100);
+        // Remove platforms that are completely off screen
+        // Keep platforms only if they're at least partially visible
+        // This prevents jumping on invisible platforms below the screen edge
+        platforms = platforms.filter(platform => platform.y < canvas.height);
         
-        // Remove power-ups that are off screen
-        powerups = powerups.filter(powerup => powerup.y < canvas.height + 100);
+        // Remove power-ups that are completely off screen
+        powerups = powerups.filter(powerup => powerup.y < canvas.height);
         
-        // Remove enemies that are off screen
-        enemies = enemies.filter(enemy => enemy.y < canvas.height + 100);
+        // Remove enemies that are completely off screen
+        enemies = enemies.filter(enemy => enemy.y < canvas.height);
         
         // Remove inactive projectiles
         projectiles = projectiles.filter(projectile => projectile.active && projectile.y > -100);
@@ -1925,17 +2050,31 @@ function gameOver() {
     stopBackgroundMusic();
     playGameOverSound();
     
-    // Update high score
-    if (score > highScore) {
-        highScore = score;
-        localStorage.setItem('doodleJumpHighScore', highScore);
-    }
+    // Check if this is a new high score
+    const currentHighScore = getHighScore();
+    const wasNewHighScore = score > currentHighScore;
     
     // Show game over screen
     document.getElementById('finalScore').textContent = score;
-    document.getElementById('finalHighScore').textContent = highScore;
-    document.getElementById('highScore').textContent = highScore;
+    document.getElementById('finalHighScore').textContent = currentHighScore;
+    document.getElementById('highScore').textContent = currentHighScore;
+    
+    // Show/hide high score message
+    if (wasNewHighScore) {
+        document.getElementById('highScoreMessage').classList.remove('hidden');
+    } else {
+        document.getElementById('highScoreMessage').classList.add('hidden');
+    }
+    
     document.getElementById('gameOver').classList.remove('hidden');
+    
+    // Check if score qualifies for leaderboard
+    if (isHighScore(score)) {
+        // Wait a moment before showing name input
+        setTimeout(() => {
+            promptForName(score);
+        }, 500);
+    }
 }
 
 // Initialize the game

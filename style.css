@@ -135,18 +135,30 @@ button:active {
     transform: translateY(0);
 }
 
-.mute-btn {
+.mute-btn,
+.leaderboard-btn {
     padding: 8px 20px;
     font-size: 0.9em;
     margin-top: 10px;
+    display: inline-block;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+.mute-btn {
     background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
 }
 
 .mute-btn:hover {
     box-shadow: 0 5px 20px rgba(76, 175, 80, 0.4);
+}
+
+.leaderboard-btn {
+    background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+}
+
+.leaderboard-btn:hover {
+    box-shadow: 0 5px 20px rgba(255, 152, 0, 0.4);
 }
 
 .platform-legend,
@@ -258,6 +270,174 @@ button:active {
 
 .audio-info strong {
     color: #4CAF50;
+}
+
+/* Leaderboard and Modal Styles */
+.name-input-modal,
+.leaderboard-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.name-input-modal.hidden,
+.leaderboard-modal.hidden {
+    display: none;
+}
+
+.modal-content {
+    background: white;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    text-align: center;
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.modal-content h2 {
+    color: #667eea;
+    font-size: 2em;
+    margin-bottom: 20px;
+}
+
+.modal-content p {
+    font-size: 1.1em;
+    margin: 10px 0;
+    color: #333;
+}
+
+#playerNameInput {
+    width: 100%;
+    max-width: 300px;
+    padding: 12px;
+    font-size: 1.1em;
+    border: 2px solid #667eea;
+    border-radius: 10px;
+    margin: 15px 0;
+    text-align: center;
+    outline: none;
+}
+
+#playerNameInput:focus {
+    border-color: #764ba2;
+    box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
+}
+
+.high-score-message {
+    color: #FF9800;
+    font-weight: bold;
+    font-size: 1.3em;
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+.view-leaderboard-btn {
+    background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+    margin-top: 10px;
+    padding: 12px 30px;
+    font-size: 1em;
+}
+
+.view-leaderboard-btn:hover {
+    box-shadow: 0 5px 20px rgba(255, 152, 0, 0.4);
+}
+
+.skip-btn {
+    background: linear-gradient(135deg, #757575 0%, #616161 100%);
+    padding: 10px 30px;
+    font-size: 1em;
+    margin-left: 10px;
+}
+
+.skip-btn:hover {
+    box-shadow: 0 5px 20px rgba(117, 117, 117, 0.4);
+}
+
+.leaderboard-list {
+    margin: 20px 0;
+    text-align: left;
+}
+
+.leaderboard-entry {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    margin: 10px 0;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 10px;
+    border-left: 5px solid #667eea;
+    transition: transform 0.2s;
+}
+
+.leaderboard-entry:hover {
+    transform: translateX(5px);
+}
+
+.leaderboard-entry.rank-1 {
+    background: linear-gradient(135deg, #FFD700 0%, #FFC107 100%);
+    border-left-color: #FF9800;
+    box-shadow: 0 3px 10px rgba(255, 193, 7, 0.3);
+}
+
+.leaderboard-entry.rank-2 {
+    background: linear-gradient(135deg, #E8E8E8 0%, #C0C0C0 100%);
+    border-left-color: #9E9E9E;
+}
+
+.leaderboard-entry.rank-3 {
+    background: linear-gradient(135deg, #FFE4C4 0%, #CD7F32 100%);
+    border-left-color: #A0522D;
+}
+
+.leaderboard-rank {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #667eea;
+    margin-right: 15px;
+    min-width: 40px;
+}
+
+.leaderboard-entry.rank-1 .leaderboard-rank {
+    color: #F57C00;
+}
+
+.leaderboard-name {
+    flex-grow: 1;
+    font-size: 1.1em;
+    color: #333;
+    font-weight: 500;
+}
+
+.leaderboard-score {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #667eea;
+}
+
+.leaderboard-entry.rank-1 .leaderboard-score {
+    color: #F57C00;
+}
+
+.leaderboard-empty {
+    text-align: center;
+    color: #999;
+    font-style: italic;
+    padding: 30px;
 }
 
 @media (max-width: 600px) {

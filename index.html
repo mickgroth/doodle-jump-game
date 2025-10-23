@@ -24,13 +24,35 @@
                 <span id="difficultyName">(Easy)</span>
             </div>
             <button id="muteBtn" class="mute-btn">🔊 Mute</button>
+            <button id="leaderboardBtn" class="leaderboard-btn">🏆 Leaderboard</button>
         </div>
         <canvas id="gameCanvas"></canvas>
         <div class="game-over" id="gameOver">
             <h2>Game Over!</h2>
             <p>Score: <span id="finalScore">0</span></p>
             <p>High Score: <span id="finalHighScore">0</span></p>
+            <p id="highScoreMessage" class="high-score-message hidden">🎉 New High Score!</p>
             <button id="restartBtn">Play Again</button>
+            <button id="viewLeaderboardBtn" class="view-leaderboard-btn">View Leaderboard</button>
+        </div>
+        <div class="name-input-modal hidden" id="nameInputModal">
+            <div class="modal-content">
+                <h2>🎉 New High Score!</h2>
+                <p>You scored <span id="newHighScore">0</span> points!</p>
+                <p>Enter your name for the leaderboard:</p>
+                <input type="text" id="playerNameInput" maxlength="15" placeholder="Your Name" autocomplete="off">
+                <button id="submitNameBtn">Submit</button>
+                <button id="skipNameBtn" class="skip-btn">Skip</button>
+            </div>
+        </div>
+        <div class="leaderboard-modal hidden" id="leaderboardModal">
+            <div class="modal-content">
+                <h2>🏆 Leaderboard</h2>
+                <div class="leaderboard-list" id="leaderboardList">
+                    <!-- Leaderboard entries will be inserted here -->
+                </div>
+                <button id="closeLeaderboardBtn">Close</button>
+            </div>
         </div>
         <div class="start-screen" id="startScreen">
             <h2>Doodle Jump</h2>
