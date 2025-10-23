@@ -2,7 +2,7 @@
 
 A web-based replica of the classic iOS game Doodle Jump, built with HTML5 Canvas and vanilla JavaScript.
 
-**[▶️ Play the game here!](https://yourusername.github.io/doodle-jump-game/)** *(Update this link with your actual URL)*
+**[▶️ Play the game here!](https://mickgroth.github.io/doodle-jump-game/)** *(Update this link with your actual URL)*
 
 ## ✨ Features
 
