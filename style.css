@@ -1,0 +1,293 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.game-container {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    padding: 20px;
+    max-width: 500px;
+    width: 100%;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.header h1 {
+    color: #667eea;
+    font-size: 2em;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.score-container,
+.high-score-container,
+.difficulty-container {
+    display: inline-block;
+    margin: 0 15px;
+    font-size: 1.2em;
+    color: #333;
+}
+
+.difficulty-container {
+    width: 100%;
+    margin-top: 10px;
+}
+
+#difficultyName {
+    color: #666;
+    font-style: italic;
+    font-size: 0.9em;
+}
+
+.label {
+    font-weight: bold;
+    color: #667eea;
+}
+
+#gameCanvas {
+    display: block;
+    width: 100%;
+    max-width: 450px;
+    height: 600px;
+    margin: 0 auto;
+    background: linear-gradient(180deg, #e3f2fd 0%, #fff9c4 100%);
+    border: 3px solid #667eea;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.controls {
+    text-align: center;
+    margin-top: 15px;
+    color: #666;
+    font-size: 0.9em;
+}
+
+.game-over,
+.start-screen {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    z-index: 1000;
+    min-width: 300px;
+}
+
+.game-over.hidden,
+.start-screen.hidden {
+    display: none;
+}
+
+.game-over h2,
+.start-screen h2 {
+    color: #667eea;
+    font-size: 2.5em;
+    margin-bottom: 20px;
+}
+
+.game-over p,
+.start-screen p {
+    font-size: 1.2em;
+    margin: 10px 0;
+    color: #333;
+}
+
+button {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 15px 40px;
+    font-size: 1.2em;
+    border-radius: 50px;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    font-weight: bold;
+}
+
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+.mute-btn {
+    padding: 8px 20px;
+    font-size: 0.9em;
+    margin-top: 10px;
+    background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.mute-btn:hover {
+    box-shadow: 0 5px 20px rgba(76, 175, 80, 0.4);
+}
+
+.platform-legend,
+.powerup-legend,
+.enemy-legend,
+.background-legend {
+    margin-top: 20px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    border: 2px solid #e9ecef;
+}
+
+.powerup-legend {
+    background: #fff3e0;
+    border: 2px solid #ffe0b2;
+}
+
+.enemy-legend {
+    background: #ffebee;
+    border: 2px solid #ffcdd2;
+}
+
+.background-legend {
+    background: linear-gradient(135deg, #e3f2fd 0%, #fff9c4 50%, #ffe0b2 100%);
+    border: 2px solid #90caf9;
+}
+
+.platform-legend h3,
+.powerup-legend h3,
+.enemy-legend h3,
+.background-legend h3 {
+    color: #667eea;
+    font-size: 1.1em;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.powerup-legend h3 {
+    color: #f57c00;
+}
+
+.enemy-legend h3 {
+    color: #c62828;
+}
+
+.background-legend h3 {
+    color: #1976d2;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    margin: 8px 0;
+    font-size: 0.9em;
+    color: #333;
+}
+
+.platform-color {
+    display: inline-block;
+    width: 40px;
+    height: 12px;
+    margin-right: 10px;
+    border-radius: 2px;
+    border: 1px solid #333;
+}
+
+.platform-color.normal {
+    background-color: #8B4513;
+}
+
+.platform-color.moving {
+    background-color: #4169E1;
+}
+
+.platform-color.breakable {
+    background-color: #CD853F;
+}
+
+.platform-color.disappearing {
+    background-color: #DA70D6;
+}
+
+.powerup-icon,
+.enemy-icon,
+.theme-icon {
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    margin-right: 10px;
+    text-align: center;
+    font-size: 1.5em;
+    line-height: 30px;
+}
+
+.audio-info {
+    margin-top: 20px;
+    padding: 15px;
+    background: #e8f5e9;
+    border-radius: 10px;
+    border: 2px solid #c8e6c9;
+    text-align: center;
+}
+
+.audio-info p {
+    margin: 5px 0;
+    color: #333;
+}
+
+.audio-info strong {
+    color: #4CAF50;
+}
+
+@media (max-width: 600px) {
+    .game-container {
+        padding: 15px;
+    }
+
+    .header h1 {
+        font-size: 1.5em;
+    }
+
+    #gameCanvas {
+        height: 500px;
+    }
+
+    .score-container,
+    .high-score-container {
+        display: block;
+        margin: 5px 0;
+    }
+    
+    .platform-legend,
+    .powerup-legend,
+    .enemy-legend,
+    .background-legend {
+        font-size: 0.85em;
+    }
+    
+    .legend-item {
+        margin: 6px 0;
+    }
+}
+

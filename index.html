@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doodle Jump</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <div class="header">
+            <h1>Doodle Jump</h1>
+            <div class="score-container">
+                <span class="label">Score:</span>
+                <span id="score">0</span>
+            </div>
+            <div class="high-score-container">
+                <span class="label">High Score:</span>
+                <span id="highScore">0</span>
+            </div>
+            <div class="difficulty-container">
+                <span class="label">Level:</span>
+                <span id="difficultyLevel">1</span>
+                <span id="difficultyName">(Easy)</span>
+            </div>
+            <button id="muteBtn" class="mute-btn">🔊 Mute</button>
+        </div>
+        <canvas id="gameCanvas"></canvas>
+        <div class="game-over" id="gameOver">
+            <h2>Game Over!</h2>
+            <p>Score: <span id="finalScore">0</span></p>
+            <p>High Score: <span id="finalHighScore">0</span></p>
+            <button id="restartBtn">Play Again</button>
+        </div>
+        <div class="start-screen" id="startScreen">
+            <h2>Doodle Jump</h2>
+            <p>Use Arrow Keys or A/D to move</p>
+            <p>Jump on platforms and climb as high as you can!</p>
+            <p style="font-size: 0.9em; color: #667eea; margin-top: 15px;">
+                🎯 Progressive Difficulty: New platform types unlock as you climb higher!
+            </p>
+            <p style="font-size: 0.85em; color: #888; margin-top: 8px;">
+                ✨ Smooth physics: Accelerate, slide, and feel the momentum!
+            </p>
+            <p style="font-size: 0.85em; color: #FF6B35; margin-top: 8px;">
+                🌅 Dynamic Backgrounds: Journey from notebook paper → sky → sunset → night → space!
+            </p>
+            <button id="startBtn">Start Game</button>
+        </div>
+        <div class="controls">
+            <p>Controls: ← → or A D keys to move</p>
+            <p style="font-size: 0.85em; color: #888; margin-top: 5px;">
+                Hold keys to accelerate, release to slide with momentum
+            </p>
+            <p style="font-size: 1em; color: #E53935; margin-top: 10px; font-weight: bold;">
+                🎯 SPACEBAR, W, or CLICK to shoot enemies!
+            </p>
+            <p style="font-size: 1em; color: #4CAF50; margin-top: 5px; font-weight: bold;">
+                ⬇️ Jump on top of enemies to defeat them (Mario style!)
+            </p>
+        </div>
+        <div class="platform-legend">
+            <h3>Platform Types (Progressive Difficulty):</h3>
+            <div class="legend-item">
+                <span class="platform-color normal"></span>
+                <span><strong>Brown - Normal</strong> (stable) - Level 1+</span>
+            </div>
+            <div class="legend-item">
+                <span class="platform-color moving"></span>
+                <span><strong>Blue - Moving</strong> (slides left/right) - Level 2+ (Score 300+)</span>
+            </div>
+            <div class="legend-item">
+                <span class="platform-color breakable"></span>
+                <span><strong>Tan - Breakable</strong> (breaks after one jump) - Level 3+ (Score 800+)</span>
+            </div>
+            <div class="legend-item">
+                <span class="platform-color disappearing"></span>
+                <span><strong>Purple - Disappearing</strong> (fades after touch) - Level 4+ (Score 1400+)</span>
+            </div>
+        </div>
+        <div class="powerup-legend">
+            <h3>Power-Ups & Boosts:</h3>
+            <div class="legend-item">
+                <span class="powerup-icon spring">🔴</span>
+                <span><strong>Spring</strong> - Extra high jump! Found on platforms.</span>
+            </div>
+            <div class="legend-item">
+                <span class="powerup-icon jetpack">🔵</span>
+                <span><strong>Jetpack</strong> - Rapid ascent for 3 seconds! (Score 100+)</span>
+            </div>
+            <div class="legend-item">
+                <span class="powerup-icon propeller">🟠</span>
+                <span><strong>Propeller Hat</strong> - Controlled flight for 4 seconds! (Score 100+)</span>
+            </div>
+        </div>
+        <div class="enemy-legend">
+            <h3>⚔️ Enemies & Combat:</h3>
+            <div class="legend-item">
+                <span class="enemy-icon">👾</span>
+                <span><strong>Monsters</strong> - Jump on them or shoot them! (Score 150+)</span>
+            </div>
+            <div class="legend-item">
+                <span class="enemy-icon">🛸</span>
+                <span><strong>UFOs</strong> - Jump on them or shoot them! (Score 150+)</span>
+            </div>
+            <div class="legend-item">
+                <span class="enemy-icon">⚠️</span>
+                <span><strong>Warning:</strong> Touching enemies from the side = Game Over!</span>
+            </div>
+            <div class="legend-item">
+                <span class="enemy-icon">💫</span>
+                <span><strong>Reward:</strong> +50 points per enemy (jump or shoot)</span>
+            </div>
+            <div class="legend-item" style="margin-top: 8px; font-size: 0.85em; color: #4CAF50;">
+                <span class="enemy-icon">🛡️</span>
+                <span><strong>Smart Placement:</strong> Enemies avoid spawning near springs to prevent unfair deaths!</span>
+            </div>
+        </div>
+        <div class="background-legend">
+            <h3>🌈 Background Themes:</h3>
+            <div class="legend-item">
+                <span class="theme-icon">📄</span>
+                <span><strong>Notebook Paper</strong> - Classic doodle style (Score 0-299)</span>
+            </div>
+            <div class="legend-item">
+                <span class="theme-icon">☁️</span>
+                <span><strong>Sky with Clouds</strong> - Bright and cheerful (Score 300-799)</span>
+            </div>
+            <div class="legend-item">
+                <span class="theme-icon">🌅</span>
+                <span><strong>Sunset</strong> - Beautiful orange hues (Score 800-1399)</span>
+            </div>
+            <div class="legend-item">
+                <span class="theme-icon">🌙</span>
+                <span><strong>Night Sky</strong> - Stars and moon (Score 1400-1999)</span>
+            </div>
+            <div class="legend-item">
+                <span class="theme-icon">🌌</span>
+                <span><strong>Deep Space</strong> - Cosmic adventure! (Score 2000+)</span>
+            </div>
+        </div>
+        <div class="audio-info">
+            <p>🔊 <strong>Audio Features:</strong> Melodic background music that builds as you climb!</p>
+            <p style="font-size: 0.9em; margin-top: 5px;">🎵 Musical progression: Gentle melody → Adds harmony → Chord accompaniment → Bass line → Percussion</p>
+            <p style="font-size: 0.85em; color: #888; margin-top: 5px;">Use the Mute button above to toggle sound on/off</p>
+        </div>
+    </div>
+    <script src="game.js"></script>
+</body>
+</html>
+
