@@ -11,6 +11,10 @@ let gameState = 'start'; // 'start', 'playing', 'gameover'
 let score = 0;
 let cameraY = 0;
 
+// Firebase Database
+let firebaseDB = null;
+let firebaseEnabled = false;
+
 // Leaderboard
 const MAX_LEADERBOARD_ENTRIES = 10;
 let leaderboard = JSON.parse(localStorage.getItem('doodleJumpLeaderboard')) || [];
@@ -18,6 +22,29 @@ let leaderboard = JSON.parse(localStorage.getItem('doodleJumpLeaderboard')) || [
 // High score is derived from leaderboard
 function getHighScore() {
     return leaderboard.length > 0 ? leaderboard[0].score : 0;
+}
+
+// Initialize Firebase
+function initFirebase() {
+    try {
+        if (typeof initializeFirebase === 'function') {
+            firebaseDB = initializeFirebase();
+            if (firebaseDB) {
+                firebaseEnabled = true;
+                console.log('🔥 Firebase connected! Leaderboard is now global.');
+                loadFirebaseLeaderboard();
+            } else {
+                console.log('📝 Firebase not configured. Using local leaderboard only.');
+                firebaseEnabled = false;
+            }
+        } else {
+            console.log('📝 Firebase config not found. Using local leaderboard only.');
+            firebaseEnabled = false;
+        }
+    } catch (error) {
+        console.error('Firebase initialization error:', error);
+        firebaseEnabled = false;
+    }
 }
 
 // Player object
@@ -941,6 +968,59 @@ function isHighScore(score) {
     return score > leaderboard[leaderboard.length - 1].score;
 }
 
+// Load leaderboard from Firebase
+function loadFirebaseLeaderboard() {
+    if (!firebaseEnabled || !firebaseDB) return;
+    
+    try {
+        firebaseDB.ref('leaderboard')
+            .orderByChild('score')
+            .limitToLast(MAX_LEADERBOARD_ENTRIES)
+            .once('value')
+            .then(snapshot => {
+                const firebaseData = [];
+                snapshot.forEach(childSnapshot => {
+                    firebaseData.push(childSnapshot.val());
+                });
+                
+                // Sort by score descending
+                leaderboard = firebaseData.sort((a, b) => b.score - a.score);
+                
+                // Also save to local storage as backup
+                saveLeaderboard();
+                
+                console.log('✅ Loaded', leaderboard.length, 'scores from Firebase');
+            })
+            .catch(error => {
+                console.error('Error loading Firebase leaderboard:', error);
+            });
+    } catch (error) {
+        console.error('Firebase load error:', error);
+    }
+}
+
+// Save score to Firebase
+function saveToFirebase(name, score) {
+    if (!firebaseEnabled || !firebaseDB) return;
+    
+    try {
+        const newScoreRef = firebaseDB.ref('leaderboard').push();
+        newScoreRef.set({
+            name: name,
+            score: score,
+            timestamp: Date.now()
+        }).then(() => {
+            console.log('✅ Score saved to Firebase!');
+            // Reload leaderboard to get updated global scores
+            loadFirebaseLeaderboard();
+        }).catch(error => {
+            console.error('Error saving to Firebase:', error);
+        });
+    } catch (error) {
+        console.error('Firebase save error:', error);
+    }
+}
+
 function addToLeaderboard(name, score) {
     leaderboard.push({ name, score, date: new Date().toISOString() });
     
@@ -951,15 +1031,65 @@ function addToLeaderboard(name, score) {
     leaderboard = leaderboard.slice(0, MAX_LEADERBOARD_ENTRIES);
     
     saveLeaderboard();
+    
+    // Also save to Firebase if enabled
+    if (firebaseEnabled) {
+        saveToFirebase(name, score);
+    }
 }
 
 function showLeaderboard() {
+    const leaderboardList = document.getElementById('leaderboardList');
+    leaderboardList.innerHTML = '<div class="loading">Loading...</div>';
+    
+    // If Firebase is enabled, reload latest scores first
+    if (firebaseEnabled && firebaseDB) {
+        firebaseDB.ref('leaderboard')
+            .orderByChild('score')
+            .limitToLast(MAX_LEADERBOARD_ENTRIES)
+            .once('value')
+            .then(snapshot => {
+                const firebaseData = [];
+                snapshot.forEach(childSnapshot => {
+                    firebaseData.push(childSnapshot.val());
+                });
+                
+                // Sort by score descending
+                leaderboard = firebaseData.sort((a, b) => b.score - a.score);
+                
+                displayLeaderboard();
+            })
+            .catch(error => {
+                console.error('Error loading leaderboard:', error);
+                displayLeaderboard(); // Fall back to local leaderboard
+            });
+    } else {
+        displayLeaderboard(); // Use local leaderboard
+    }
+    
+    document.getElementById('leaderboardModal').classList.remove('hidden');
+}
+
+function displayLeaderboard() {
     const leaderboardList = document.getElementById('leaderboardList');
     leaderboardList.innerHTML = '';
     
     if (leaderboard.length === 0) {
         leaderboardList.innerHTML = '<div class="leaderboard-empty">No scores yet. Be the first!</div>';
     } else {
+        // Add Firebase indicator
+        if (firebaseEnabled) {
+            const indicator = document.createElement('div');
+            indicator.className = 'firebase-indicator';
+            indicator.innerHTML = '🌍 Global Leaderboard';
+            leaderboardList.appendChild(indicator);
+        } else {
+            const indicator = document.createElement('div');
+            indicator.className = 'local-indicator';
+            indicator.innerHTML = '📝 Local Leaderboard';
+            leaderboardList.appendChild(indicator);
+        }
+        
         leaderboard.forEach((entry, index) => {
             const entryDiv = document.createElement('div');
             entryDiv.className = `leaderboard-entry rank-${index + 1}`;
@@ -983,8 +1113,6 @@ function showLeaderboard() {
             leaderboardList.appendChild(entryDiv);
         });
     }
-    
-    document.getElementById('leaderboardModal').classList.remove('hidden');
 }
 
 function hideLeaderboard() {
@@ -1027,6 +1155,9 @@ function skipPlayerName() {
 
 // Initialize game
 function init() {
+    // Initialize Firebase first
+    initFirebase();
+    
     document.getElementById('highScore').textContent = getHighScore();
     document.getElementById('finalHighScore').textContent = getHighScore();
     

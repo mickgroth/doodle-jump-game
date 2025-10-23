@@ -440,6 +440,36 @@ button:active {
     padding: 30px;
 }
 
+.firebase-indicator,
+.local-indicator,
+.loading {
+    text-align: center;
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 1em;
+}
+
+.firebase-indicator {
+    background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+    color: white;
+    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+}
+
+.local-indicator {
+    background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+    color: white;
+    box-shadow: 0 2px 8px rgba(255, 152, 0, 0.3);
+}
+
+.loading {
+    background: #f8f9fa;
+    color: #667eea;
+    font-style: italic;
+    animation: pulse 1.5s infinite;
+}
+
 @media (max-width: 600px) {
     .game-container {
         padding: 15px;
