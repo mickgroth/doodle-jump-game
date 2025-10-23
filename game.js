@@ -11,6 +11,12 @@ let gameState = 'start'; // 'start', 'playing', 'gameover'
 let score = 0;
 let cameraY = 0;
 
+// Frame rate independence
+let lastFrameTime = 0;
+const TARGET_FPS = 60;
+const TARGET_FRAME_TIME = 1000 / TARGET_FPS; // ~16.67ms for 60fps
+let deltaMultiplier = 1;
+
 // Firebase Database
 let firebaseDB = null;
 let firebaseEnabled = false;
@@ -908,7 +914,7 @@ function updateBackgroundElements() {
     // Update clouds (for sky and sunset themes)
     if (theme === 'sky' || theme === 'sunset') {
         clouds.forEach(cloud => {
-            cloud.y += cloud.speed;
+            cloud.y += cloud.speed * deltaMultiplier;
             
             // Wrap around
             if (cloud.y > canvas.height + 50) {
@@ -921,14 +927,14 @@ function updateBackgroundElements() {
     // Update stars (for night and space themes)
     if (theme === 'night' || theme === 'space') {
         stars.forEach(star => {
-            star.opacity += star.twinkleSpeed * star.twinkleDirection;
+            star.opacity += star.twinkleSpeed * star.twinkleDirection * deltaMultiplier;
             if (star.opacity <= 0.2 || star.opacity >= 1) {
                 star.twinkleDirection *= -1;
             }
         });
         
         // Occasionally create shooting stars in space theme
-        if (theme === 'space' && Math.random() < 0.005) {
+        if (theme === 'space' && Math.random() < 0.005 * deltaMultiplier) {
             shootingStars.push({
                 x: Math.random() * canvas.width,
                 y: Math.random() * canvas.height * 0.5,
@@ -942,9 +948,9 @@ function updateBackgroundElements() {
         
         // Update shooting stars
         shootingStars = shootingStars.filter(star => {
-            star.x += Math.cos(star.angle) * star.speed;
-            star.y += Math.sin(star.angle) * star.speed;
-            star.life += 1;
+            star.x += Math.cos(star.angle) * star.speed * deltaMultiplier;
+            star.y += Math.sin(star.angle) * star.speed * deltaMultiplier;
+            star.life += 1 * deltaMultiplier;
             star.opacity = Math.max(0, 1 - star.life / 60);
             return star.life < 60;
         });
@@ -1214,6 +1220,10 @@ function startGame() {
     score = 0;
     cameraY = 0;
     
+    // Reset frame timing for frame-rate independence
+    lastFrameTime = 0;
+    deltaMultiplier = 1;
+    
     // Reset difficulty display
     updateDifficultyDisplay(0);
     
@@ -1283,8 +1293,22 @@ function restartGame() {
     startGame();
 }
 
-function gameLoop() {
+function gameLoop(currentTime = 0) {
     if (gameState !== 'playing') return;
+    
+    // Calculate delta time
+    if (lastFrameTime === 0) {
+        lastFrameTime = currentTime;
+    }
+    const deltaTime = currentTime - lastFrameTime;
+    lastFrameTime = currentTime;
+    
+    // Calculate delta multiplier (how much to scale movement for frame-rate independence)
+    // If running at 60fps, multiplier = 1. If 120fps, multiplier = 0.5, etc.
+    deltaMultiplier = deltaTime / TARGET_FRAME_TIME;
+    
+    // Cap delta multiplier to prevent huge jumps (e.g., when tab loses focus)
+    deltaMultiplier = Math.min(deltaMultiplier, 3);
     
     update();
     render();
@@ -1299,7 +1323,7 @@ function update() {
     // Handle input with acceleration
     if (keys['ArrowLeft'] || keys['a'] || keys['A']) {
         // Accelerate left
-        player.velocityX -= player.acceleration;
+        player.velocityX -= player.acceleration * deltaMultiplier;
         // Cap at max speed
         if (player.velocityX < -player.maxSpeed) {
             player.velocityX = -player.maxSpeed;
@@ -1307,7 +1331,7 @@ function update() {
         player.direction = -1; // Face left
     } else if (keys['ArrowRight'] || keys['d'] || keys['D']) {
         // Accelerate right
-        player.velocityX += player.acceleration;
+        player.velocityX += player.acceleration * deltaMultiplier;
         // Cap at max speed
         if (player.velocityX > player.maxSpeed) {
             player.velocityX = player.maxSpeed;
@@ -1317,7 +1341,7 @@ function update() {
         // Apply friction when no input
         // Use different friction based on whether player is on ground or in air
         const currentFriction = player.isOnGround ? player.friction : player.airFriction;
-        player.velocityX *= currentFriction;
+        player.velocityX *= Math.pow(currentFriction, deltaMultiplier);
         
         // Stop completely if velocity is very small
         if (Math.abs(player.velocityX) < 0.1) {
@@ -1326,8 +1350,8 @@ function update() {
     }
     
     // Update player position
-    player.x += player.velocityX;
-    player.y += player.velocityY;
+    player.x += player.velocityX * deltaMultiplier;
+    player.y += player.velocityY * deltaMultiplier;
     
     // Reset ground state (will be set to true if landing on platform)
     player.isOnGround = false;
@@ -1340,15 +1364,15 @@ function update() {
         // Propeller provides gentle upward force
         player.velocityY = -5;
     } else {
-    player.velocityY += player.gravity;
+        player.velocityY += player.gravity * deltaMultiplier;
     }
     
     // Update active power-up timer
     if (activePowerup.active) {
-        activePowerup.timer--;
+        activePowerup.timer -= deltaMultiplier;
         
         // Play jetpack sound periodically
-        if (activePowerup.type === POWERUP_TYPES.JETPACK && activePowerup.timer % 10 === 0) {
+        if (activePowerup.type === POWERUP_TYPES.JETPACK && Math.floor(activePowerup.timer) % 10 === 0 && deltaMultiplier > 0.5) {
             playJetpackSound();
         }
         
@@ -1369,7 +1393,7 @@ function update() {
         platforms.forEach(platform => {
         // Update moving platforms
         if (platform.type === PLATFORM_TYPES.MOVING && !platform.broken) {
-            platform.x += platform.moveSpeed * platform.moveDirection;
+            platform.x += platform.moveSpeed * platform.moveDirection * deltaMultiplier;
             
             // Reverse direction if reached the limits
             if (platform.x < platform.startX - platform.moveRange || 
@@ -1389,8 +1413,8 @@ function update() {
         
         // Update disappearing platforms
         if (platform.type === PLATFORM_TYPES.DISAPPEARING && platform.touched) {
-            platform.disappearTimer++;
-            // Disappear after 30 frames (about 0.5 seconds)
+            platform.disappearTimer += deltaMultiplier;
+            // Disappear after 30 frames (about 0.5 seconds at 60fps)
             if (platform.disappearTimer > 30) {
                 platform.disappeared = true;
             }
@@ -1409,7 +1433,7 @@ function update() {
                 player.x + player.width > platform.x &&
                 player.x < platform.x + platform.width &&
                 player.y + player.height > platform.y &&
-                player.y + player.height < platform.y + platform.height + player.velocityY &&
+                player.y + player.height < platform.y + platform.height + player.velocityY * deltaMultiplier &&
                 player.velocityY > 0
             ) {
                 // Make the player jump
@@ -1444,13 +1468,13 @@ function update() {
         // Update UFO floating and movement
         if (enemy.type === ENEMY_TYPES.UFO) {
             // Floating animation
-            enemy.floatOffset += 0.05 * enemy.floatDirection;
+            enemy.floatOffset += 0.05 * enemy.floatDirection * deltaMultiplier;
             if (Math.abs(enemy.floatOffset) > 10) {
                 enemy.floatDirection *= -1;
             }
             
             // Horizontal movement
-            enemy.x += enemy.moveSpeed * enemy.moveDirection;
+            enemy.x += enemy.moveSpeed * enemy.moveDirection * deltaMultiplier;
             
             // Bounce off edges
             if (enemy.x < 0 || enemy.x + enemy.width > canvas.width) {
@@ -1463,7 +1487,7 @@ function update() {
     projectiles.forEach(projectile => {
         if (!projectile.active) return;
         
-        projectile.y += projectile.velocityY;
+        projectile.y += projectile.velocityY * deltaMultiplier;
         
         // Deactivate if off screen
         if (projectile.y < -50) {
