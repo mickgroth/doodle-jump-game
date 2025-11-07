@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deploy Your Game - Step by Step Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px 20px;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 1.2em;
+        }
+        
+        .step {
+            background: #f8f9fa;
+            border-left: 5px solid #667eea;
+            padding: 25px;
+            margin-bottom: 25px;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+        
+        .step:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+        
+        .step-number {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            width: 40px;
+            height: 40px;
+            line-height: 40px;
+            text-align: center;
+            border-radius: 50%;
+            font-weight: bold;
+            margin-right: 15px;
+            font-size: 1.2em;
+        }
+        
+        .step-title {
+            display: inline-block;
+            font-size: 1.5em;
+            color: #667eea;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .step-content {
+            margin-left: 55px;
+            line-height: 1.8;
+        }
+        
+        .step-content ul {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+        
+        .step-content li {
+            margin: 8px 0;
+        }
+        
+        .url-box {
+            background: #e3f2fd;
+            border: 2px dashed #667eea;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1em;
+            color: #333;
+        }
+        
+        .highlight {
+            background: #fff3cd;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        
+        .success {
+            background: #d4edda;
+            border: 2px solid #28a745;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 30px;
+        }
+        
+        .success h2 {
+            color: #28a745;
+            margin-bottom: 10px;
+        }
+        
+        .link-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            text-decoration: none;
+            border-radius: 50px;
+            margin: 10px 5px;
+            transition: transform 0.2s;
+            font-weight: bold;
+        }
+        
+        .link-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .tip {
+            background: #fff3cd;
+            border-left: 5px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .tip strong {
+            color: #856404;
+        }
+        
+        .time-estimate {
+            display: inline-block;
+            background: #28a745;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            margin-left: 10px;
+        }
+        
+        .files-list {
+            background: #e8f5e9;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+        
+        .files-list ul {
+            list-style: none;
+            margin-left: 0;
+        }
+        
+        .files-list li:before {
+            content: "📄 ";
+            margin-right: 8px;
+        }
+        
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #c7254e;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Deploy Your Doodle Jump Game</h1>
+        <p class="subtitle">Follow these steps to get your game online in 10 minutes!</p>
+        
+        <div class="step">
+            <span class="step-number">1</span>
+            <div class="step-title">Create GitHub Account <span class="time-estimate">2 min</span></div>
+            <div class="step-content">
+                <ul>
+                    <li>Go to <a href="https://github.com" target="_blank">github.com</a></li>
+                    <li>Click <span class="highlight">Sign up</span> (if you don't have an account)</li>
+                    <li>Follow the registration process</li>
+                    <li>Verify your email address</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="step">
+            <span class="step-number">2</span>
+            <div class="step-title">Create New Repository <span class="time-estimate">2 min</span></div>
+            <div class="step-content">
+                <ul>
+                    <li>Click the <span class="highlight">+</span> icon in the top-right corner</li>
+                    <li>Select <span class="highlight">New repository</span></li>
+                    <li><strong>Repository name:</strong> <code>doodle-jump-game</code> (or any name you prefer)</li>
+                    <li><strong>Description:</strong> "A fun Doodle Jump clone"</li>
+                    <li>Select <span class="highlight">Public</span> (required for free GitHub Pages)</li>
+                    <li>Click <span class="highlight">Create repository</span></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="step">
+            <span class="step-number">3</span>
+            <div class="step-title">Upload Your Game Files <span class="time-estimate">3 min</span></div>
+            <div class="step-content">
+                <p>On your new repository page:</p>
+                <ul>
+                    <li>Click <span class="highlight">Add file</span> → <span class="highlight">Upload files</span></li>
+                    <li>Drag and drop these files from your folder:</li>
+                </ul>
+                
+                <div class="files-list">
+                    <ul>
+                        <li><strong>index.html</strong> - Main game page</li>
+                        <li><strong>game.js</strong> - Game logic</li>
+                        <li><strong>style.css</strong> - Styling</li>
+                        <li><strong>README.md</strong> - Description</li>
+                    </ul>
+                </div>
+                
+                <ul>
+                    <li>Scroll down and click <span class="highlight">Commit changes</span></li>
+                    <li>Wait for the upload to complete (green checkmark)</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="step">
+            <span class="step-number">4</span>
+            <div class="step-title">Enable GitHub Pages <span class="time-estimate">2 min</span></div>
+            <div class="step-content">
+                <ul>
+                    <li>In your repository, click <span class="highlight">Settings</span> (top menu)</li>
+                    <li>Scroll down and click <span class="highlight">Pages</span> (left sidebar)</li>
+                    <li>Under <strong>Source</strong>, select:</li>
+                    <ul>
+                        <li><strong>Branch:</strong> <code>main</code> (or <code>master</code>)</li>
+                        <li><strong>Folder:</strong> <code>/ (root)</code></li>
+                    </ul>
+                    <li>Click <span class="highlight">Save</span></li>
+                    <li><strong>Wait 2-3 minutes</strong> for deployment to complete</li>
+                </ul>
+                
+                <div class="tip">
+                    <strong>💡 Tip:</strong> The page will show you the URL where your game will be published. Bookmark it!
+                </div>
+            </div>
+        </div>
+        
+        <div class="step">
+            <span class="step-number">5</span>
+            <div class="step-title">Get Your Game URL! <span class="time-estimate">1 min</span></div>
+            <div class="step-content">
+                <p>Your game will be live at this URL:</p>
+                
+                <div class="url-box">
+                    https://<strong>YOUR-USERNAME</strong>.github.io/<strong>doodle-jump-game</strong>/
+                </div>
+                
+                <p>Replace <code>YOUR-USERNAME</code> with your actual GitHub username.</p>
+                
+                <div class="tip">
+                    <strong>🎮 Test it:</strong> Open the URL in your browser and play the game to make sure everything works!
+                </div>
+            </div>
+        </div>
+        
+        <div class="success">
+            <h2>🎉 Congratulations!</h2>
+            <p>Your game is now live on the internet!</p>
+            <p style="margin-top: 15px; font-size: 1.1em;">Share it with your friends:</p>
+            <div style="margin-top: 20px;">
+                <a href="https://github.com" target="_blank" class="link-button">🔗 Go to GitHub</a>
+                <a href="DEPLOYMENT_GUIDE.md" class="link-button">📖 Full Guide</a>
+            </div>
+        </div>
+        
+        <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 10px;">
+            <h3 style="color: #667eea; margin-bottom: 15px;">📤 Sharing Options:</h3>
+            <ul style="line-height: 2;">
+                <li>📧 <strong>Email:</strong> Send the URL directly</li>
+                <li>💬 <strong>Messaging:</strong> WhatsApp, Discord, Slack, etc.</li>
+                <li>📱 <strong>Social Media:</strong> Post on your profiles</li>
+                <li>🔗 <strong>QR Code:</strong> Use <a href="https://qr-code-generator.com" target="_blank">qr-code-generator.com</a> to create a QR code</li>
+                <li>📋 <strong>Short URL:</strong> Use <a href="https://bit.ly" target="_blank">bit.ly</a> or <a href="https://tinyurl.com" target="_blank">tinyurl.com</a> for a shorter link</li>
+            </ul>
+        </div>
+        
+        <div style="margin-top: 30px; padding: 20px; background: #e3f2fd; border-radius: 10px;">
+            <h3 style="color: #667eea; margin-bottom: 15px;">🔧 Troubleshooting:</h3>
+            <ul style="line-height: 2;">
+                <li><strong>Game not loading?</strong> Wait 2-3 minutes after enabling Pages, then refresh</li>
+                <li><strong>404 Error?</strong> Make sure <code>index.html</code> is in the root folder</li>
+                <li><strong>Styles missing?</strong> Verify all files uploaded successfully</li>
+                <li><strong>Still having issues?</strong> Check <a href="DEPLOYMENT_GUIDE.md">DEPLOYMENT_GUIDE.md</a> for detailed help</li>
+            </ul>
+        </div>
+        
+        <div style="text-align: center; margin-top: 40px; color: #666;">
+            <p>Good luck with your deployment! 🎮✨</p>
+        </div>
+    </div>
+</body>
+</html>
+
