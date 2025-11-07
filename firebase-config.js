@@ -30,4 +30,3 @@ function initializeFirebase() {
         return null;
     }
 }
-
